@@ -47,8 +47,8 @@ function OrdersPage() {
                         <img src={item.imageURL} height="90" width="90"></img>
                       </td>
                       <td>{item.name}</td>
-                      <td>1</td>
-                      <td>{item.price}</td>
+                      <td>{item.quantity}</td>
+                      <td>{item.price * item.quantity}</td>
                     </tr>
                   );
                 })}
