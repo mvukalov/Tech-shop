@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Layout from "../components/Layout";
-import { collection, addDoc, getDocs, doc } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import techDB from "../fireConfig";
 
 function OrdersPage() {
@@ -37,6 +37,7 @@ function OrdersPage() {
                   <th>Name</th>
                   <th>Quantity</th>
                   <th>Price</th>
+                  <th>Total</th>
                 </tr>
               </thead>
               <tbody>
@@ -44,10 +45,16 @@ function OrdersPage() {
                   return (
                     <tr>
                       <td>
-                        <img src={item.imageURL} height="90" width="90"></img>
+                        <img
+                          src={item.imageURL}
+                          height="90"
+                          width="90"
+                          alt=""
+                        ></img>
                       </td>
                       <td>{item.name}</td>
                       <td>{item.quantity}</td>
+                      <td>{item.price}</td>
                       <td>{item.price * item.quantity}</td>
                     </tr>
                   );

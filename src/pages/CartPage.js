@@ -1,7 +1,6 @@
-import { FirebaseError } from "firebase/app";
 import React, { useEffect, useState } from "react";
-import { Button, Modal } from "react-bootstrap";
-import { FaProductHunt, FaTrash } from "react-icons/fa";
+import { Modal } from "react-bootstrap";
+import { FaTrash } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import Layout from "../components/Layout";
 import { addDoc, collection } from "firebase/firestore";
@@ -9,7 +8,6 @@ import techDB from "../fireConfig";
 
 function CartPage() {
   const { cartItems } = useSelector((state) => state.cartReducer);
-
   const dispatch = useDispatch();
 
   const [show, setShow] = useState(false);
@@ -17,24 +15,22 @@ function CartPage() {
   const handleShow = () => setShow(true);
 
   const [totalAmount, setTotalAmount] = useState("");
+  const [subAmount, setSubAmount] = useState("");
   const [address, setAddress] = useState("");
   const [email, setEmail] = useState("");
   const [card, setCardNumber] = useState("");
   const [promoText, setPromo] = useState("");
-  const [promoDiscount1, setPromoDiscount1] = useState("");
-  const [promoDiscount2, setPromoDiscount2] = useState("");
-  const [promoDiscount3, setPromoDiscount3] = useState("");
-  const [promoDiscount4, setPromoDiscount4] = useState("");
-  const [promoDiscount5, setPromoDiscount5] = useState("");
-  const [discount, setDiscount] = useState("");
-  const [subAmount, setSubAmount] = useState("");
-
-  const [globalCounter, setGlobalCounter] = useState("");
   const [counter1, setCounter1] = useState("");
   const [counter2, setCounter2] = useState("");
   const [counter3, setCounter3] = useState("");
   const [counter4, setCounter4] = useState("");
-  const [counter5, setCounter5] = useState("");
+  const [globalCounter, setGlobalCounter] = useState("");
+  const [promoDiscount1, setPromoDiscount1] = useState("");
+  const [promoDiscount2, setPromoDiscount2] = useState("");
+  const [promoDiscount3, setPromoDiscount3] = useState("");
+  const [promoDiscount4, setPromoDiscount4] = useState("");
+  const [promodiscountTotal, setPromoDiscountTotal] = useState("");
+  const [quantityDiscount, setQuantityDiscount] = useState(0);
 
   const promoObj = {
     first: "U9TfPPDOYV6z",
@@ -42,6 +38,8 @@ function CartPage() {
     third: "MEoFx3c51F0D",
   };
 
+  let smokeQuantity = 0;
+  let motionQuantity = 0;
   useEffect(() => {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
@@ -55,16 +53,37 @@ function CartPage() {
   }, [cartItems]);
 
   useEffect(() => {
-    setTotalAmount(
-      (
-        subAmount -
-        promoDiscount1 -
-        promoDiscount2 -
-        promoDiscount3 -
-        promoDiscount4 -
-        promoDiscount5
-      ).toFixed(2)
-    );
+    cartItems.forEach((item) => {
+      if (item.quantity === 2 && item.name === "Smoke Sensor X-Sense") {
+        smokeQuantity = 4.98;
+        setQuantityDiscount(smokeQuantity);
+      }
+      if (item.quantity === 3 && item.name === "Motion Sensor Guardline") {
+        motionQuantity = 9.97;
+        setQuantityDiscount(motionQuantity);
+      } else {
+        setQuantityDiscount(motionQuantity + smokeQuantity);
+      }
+    });
+  }, [cartItems]);
+
+  useEffect(() => {
+    if (promoDiscount1) {
+      setTotalAmount(totalAmount - promoDiscount1);
+      setPromoDiscountTotal(promoDiscount1 + promoDiscount3);
+    }
+    if (promoDiscount3) {
+      setTotalAmount(totalAmount - promoDiscount3);
+      setPromoDiscountTotal(promoDiscount3 + promoDiscount1);
+    }
+    if (promoDiscount4) {
+      setTotalAmount(totalAmount - promoDiscount4);
+      setPromoDiscountTotal(promoDiscount4);
+    }
+    if (promoDiscount2) {
+      setTotalAmount(totalAmount - promoDiscount2);
+      setPromoDiscountTotal(promoDiscount2 + promoDiscount3);
+    }
   }, [globalCounter]);
 
   useEffect(() => {
@@ -72,12 +91,8 @@ function CartPage() {
     cartItems.forEach((item) => {
       temp = temp + item.price * item.quantity;
     });
-    setTotalAmount(temp.toFixed(2));
+    setTotalAmount(temp - smokeQuantity - motionQuantity);
   }, [cartItems]);
-
-  useEffect(() => {
-    setDiscount((subAmount - totalAmount).toFixed(2));
-  }, [totalAmount]);
 
   const deleteFromCart = (product) => {
     dispatch({ type: "DELETE_FROM_CART", payload: product });
@@ -104,39 +119,29 @@ function CartPage() {
   };
   const solvePromo = () => {
     if (promoObj.first === promoText) {
-      if (!counter5 && !counter3 && !counter1) {
-        setGlobalCounter(1);
-        const discount1 = subAmount * 0.05;
-        setPromoDiscount1(discount1);
+      if (!counter4 && !counter3 && !counter1) {
         setCounter1(1);
+        setGlobalCounter(1);
+        setPromoDiscount1(totalAmount * 0.05).toFixed(2);
       }
-      if (counter3 && !counter5 && !counter1 && !counter2) {
-        setGlobalCounter(2);
-        const discount2 = totalAmount * 0.05;
-        setPromoDiscount2(discount2);
+      if (counter3 && !counter4 && !counter1 && !counter2) {
         setCounter2(1);
+        setGlobalCounter(2);
+        setPromoDiscount2(totalAmount * 0.05).toFixed(2);
       }
     }
     if (promoObj.second === promoText) {
-      if (!counter5 && !counter1 && !counter3) {
-        setGlobalCounter(3);
-        const discount3 = subAmount * 0.2;
-        setPromoDiscount3(discount3);
+      if (!counter4 && !counter3) {
         setCounter3(1);
-      }
-      if (counter1 && !counter5 && !counter4 && !counter3) {
-        setGlobalCounter(4);
-        const discount4 = totalAmount * 0.2;
-        setPromoDiscount4(discount4);
-        setCounter4(1);
+        setGlobalCounter(3);
+        setPromoDiscount3(20);
       }
     }
     if (promoObj.third === promoText) {
-      if (!counter1 && !counter2 && !counter5) {
-        setGlobalCounter(5);
-        const discount5 = 20;
-        setPromoDiscount5(discount5);
-        setCounter5(1);
+      if (!counter1 && !counter2 && !counter3 && !counter4) {
+        setCounter4(1);
+        setGlobalCounter(4);
+        setPromoDiscount4(totalAmount * 0.2).toFixed(2);
       }
     }
   };
@@ -152,7 +157,7 @@ function CartPage() {
                 <th>Name</th>
                 <th>Quantity</th>
                 <th>Price</th>
-                <th>Action</th>
+                <th>Total</th>
               </tr>
             </thead>
             <tbody>
@@ -161,12 +166,18 @@ function CartPage() {
                   <tr>
                     <div className="imageCard">
                       <td>
-                        <img src={item.imageURL} height="90" width="90"></img>
+                        <img
+                          src={item.imageURL}
+                          height="90"
+                          width="90"
+                          alt=""
+                        ></img>
                       </td>
                     </div>
 
                     <td>{item.name}</td>
                     <td>{item.quantity}</td>
+                    <td>{item.price}.</td>
                     <td>{item.price * item.quantity}.</td>
                     <td>
                       <FaTrash size={22} onClick={() => deleteFromCart(item)} />
@@ -182,17 +193,18 @@ function CartPage() {
 
           <div>
             <b> Subtotal:&nbsp;</b>
-            {subAmount}€
+            {Number(subAmount).toFixed(2)}€
           </div>
           <div>
-            <b> Quantity Discount:&nbsp;</b>€
+            <b> Quantity Discount:&nbsp;</b>
+            {Number(quantityDiscount).toFixed(2)}€
           </div>
           <div>
             <b> Promo Discount:&nbsp;</b>
-            {discount}€
+            {Number(promodiscountTotal).toFixed(2)}€
           </div>
           <div>
-            <b> Total:&nbsp;</b> {totalAmount}€
+            <b> Total:&nbsp;</b> {Number(totalAmount).toFixed(2)}€
           </div>
           <div className="promo">
             <button
