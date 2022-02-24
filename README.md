@@ -1,4 +1,4 @@
-[Live Demo:](https://kind-thompson-8b1149.netlify.app)
+[CLick here for Live Demo](https://kind-thompson-8b1149.netlify.app)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
