@@ -8,7 +8,7 @@ This project was built for educational and portfolio purposes to practice modern
 
 ## 🚀 Live Demo
 
-👉 (Add your Vercel / Netlify deployment link here)
+👉 https://techshop-app-mv.netlify.app/
 
 ---
 
@@ -141,7 +141,7 @@ Tech-shop/
 
 ## 👤 Author
 
-Mateo Vukalović  
+Martin Vukalović  
 GitHub: https://github.com/mvukalov
 
 ---
