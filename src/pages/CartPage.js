@@ -154,7 +154,7 @@ function CartPage() {
                 </div>
                 {nextTier ? (
                   <div className="discount-next">
-                    Add {(nextTier.min - subAmount).toFixed(2)}€ more to unlock <span>{nextTier.off}€ off</span>
+                    Add {(nextTier.min - subAmount).toFixed(2)}€ more to unlock&nbsp;<span>{nextTier.off}€ off</span>
                   </div>
                 ) : (
                   <div className="discount-next"> Maximum discount applied</div>
