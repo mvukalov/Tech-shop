@@ -1,102 +1,103 @@
-🛒 Tech Shop
+# 🛒 Tech Shop
 
 A modern e-commerce web application built with React and Firebase that allows users to browse tech products, add them to a cart, and place orders.
 
-This project was built for educational and portfolio purposes to practice modern React development, Redux state management, and integration with Firebase (Firestore).
+This project was built for educational and portfolio purposes to practice modern React development, state management with Redux, and integration with Firebase Firestore.
 
-🚀 Live Demo
+---
 
-👉 (ovdje ubaci Vercel / Netlify link ako ga deployaš)
+## 🚀 Live Demo
 
-✨ Features
+👉 (Add your Vercel / Netlify deployment link here)
 
-Browse tech products
+---
 
-Add products to cart
+## ✨ Features
 
-Remove products from cart
+- Browse tech products
+- Add products to cart
+- Remove products from cart
+- Cart subtotal and quantity calculation
+- Basic discount tier logic
+- Order placement system
+- Orders history page
+- Firebase Firestore integration
+- Data persistence using Local Storage
+- Responsive layout
 
-Cart subtotal & quantity calculation
+---
 
-Order placement
+## 🛠 Tech Stack
 
-Orders history page
+### Frontend
+- React (Functional Components + Hooks)
+- React Router DOM
+- Redux (State Management)
+- JavaScript (ES6+)
+- HTML5
+- CSS3
 
-Data persistence using Local Storage
+### Backend / Database
+- Firebase
+- Firestore Database
 
-Firebase Firestore integration
+### Other Tools
+- Local Storage API
+- Git
+- GitHub
 
-Responsive layout
+---
 
-Basic discount tier logic
-
-🛠 Tech Stack
-Frontend
-
-React (Functional Components + Hooks)
-
-React Router DOM
-
-Redux (State Management)
-
-JavaScript (ES6+)
-
-HTML5
-
-CSS3
-
-Backend / Database
-
-Firebase
-
-Firestore
-
-Other
-
-Local Storage API
-
-Git & GitHub
-
-📦 Run Locally
+## 📦 Run Locally
 
 Clone the repository:
 
+```bash
 git clone https://github.com/mvukalov/Tech-shop.git
-
+```
 
 Navigate into the project folder:
 
+```bash
 cd Tech-shop
-
+```
 
 Install dependencies:
 
+```bash
 npm install
-
+```
 
 Start development server:
 
+```bash
 npm start
+```
 
-⚙️ How It Works
+The app will run on:
+```
+http://localhost:3000
+```
 
-Products are fetched from Firebase Firestore.
+---
 
-Users can add products to the cart.
+## ⚙️ How It Works
 
-Cart state is managed globally using Redux.
+1. Products are fetched from Firebase Firestore.
+2. Users can browse available tech products.
+3. Products can be added to the cart.
+4. Cart state is managed globally using Redux.
+5. Cart data is persisted in Local Storage.
+6. When an order is placed:
+   - Order data is sent to Firestore.
+   - Cart is cleared.
+7. Orders page fetches and displays previous orders.
 
-Cart data is persisted in Local Storage.
+---
 
-When an order is placed:
+## 📁 Project Structure
 
-Order data is sent to Firestore.
-
-Cart is cleared.
-
-Orders page fetches previously stored orders from Firestore.
-
-📁 Project Structure
+```
 Tech-shop/
 ├── public/
 ├── src/
@@ -115,56 +116,36 @@ Tech-shop/
 │   └── index.js
 ├── package.json
 └── README.md
+```
 
-📡 External Services
+---
 
-Firebase — https://firebase.google.com/
+## 📡 External Services
 
-Firestore Database
+- Firebase — https://firebase.google.com/
+- React Router — https://reactrouter.com/
 
-React Router — https://reactrouter.com/
+---
 
-🧠 Key Concepts Practiced
+## 🧠 Key Concepts Practiced
 
-React Hooks (useState, useEffect)
+- React Hooks (useState, useEffect)
+- Global State Management (Redux)
+- Firestore CRUD operations
+- Component-based architecture
+- Data persistence strategies
+- Clean project structuring
+- Git & GitHub workflow
 
-Global State Management (Redux)
+---
 
-Data persistence
+## 👤 Author
 
-Firestore CRUD operations
-
-Component architecture
-
-Clean project structure
-
-Git workflow
-
-👤 Author
-
-Mateo Vukalović
+Mateo Vukalović  
 GitHub: https://github.com/mvukalov
 
-📄 License
+---
+
+## 📄 License
 
 This project is intended for educational and portfolio purposes.
-
-🔥 Ako želiš da ovo izgleda JOŠ profesionalnije
-
-Mogu ti dodati:
-
-🖼️ Screenshot sekciju
-
-🏗️ Architecture diagram
-
-🧠 Advanced technical explanation (kao junior → mid dev)
-
-🎯 CV-ready professional summary
-
-🚀 Deployment section (Vercel / Netlify)
-
-🛡️ Environment variables setup section
-
-📊 Performance improvements section
-
-Ako želiš, mogu ti odmah napraviti ultra polished README verziju (portfolio ready za posao) 💼🔥
