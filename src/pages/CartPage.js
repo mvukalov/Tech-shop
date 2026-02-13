@@ -5,271 +5,244 @@ import { useSelector, useDispatch } from "react-redux";
 import Layout from "../components/Layout";
 import { addDoc, collection } from "firebase/firestore";
 import techDB from "../fireConfig";
+import { serverTimestamp } from "firebase/firestore";
 
 function CartPage() {
   const { cartItems } = useSelector((state) => state.cartReducer);
   const dispatch = useDispatch();
 
   const [show, setShow] = useState(false);
+  const [subAmount, setSubAmount] = useState(0);
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [orderSuccess, setOrderSuccess] = useState(false);
+  const isCartEmpty = cartItems.length === 0;
+
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
-  const [totalAmount, setTotalAmount] = useState("");
-  const [subAmount, setSubAmount] = useState("");
-  const [address, setAddress] = useState("");
-  const [email, setEmail] = useState("");
-  const [card, setCardNumber] = useState("");
-  const [promoText, setPromo] = useState("");
-  const [counter1, setCounter1] = useState("");
-  const [counter2, setCounter2] = useState("");
-  const [counter3, setCounter3] = useState("");
-  const [counter4, setCounter4] = useState("");
-  const [globalCounter, setGlobalCounter] = useState("");
-  const [promoDiscount1, setPromoDiscount1] = useState("");
-  const [promoDiscount2, setPromoDiscount2] = useState("");
-  const [promoDiscount3, setPromoDiscount3] = useState("");
-  const [promoDiscount4, setPromoDiscount4] = useState("");
-  const [promodiscountTotal, setPromoDiscountTotal] = useState("");
-  const [quantityDiscount, setQuantityDiscount] = useState(0);
+  const discountTiers = [
+    { min: 159, off: 20 },
+    { min: 79, off: 10 },
+    { min: 49, off: 6 },
+    { min: 15, off: 2 },
+  ];
 
-  const promoObj = {
-    first: "U9TfPPDOYV6z",
-    second: "59H49FyXiPf3",
-    third: "MEoFx3c51F0D",
-  };
-
-  let smokeQuantity = 0;
-  let motionQuantity = 0;
   useEffect(() => {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
 
   useEffect(() => {
-    let temp = 0;
-    cartItems.forEach((item) => {
-      temp = temp + item.price * item.quantity;
-    });
-    setSubAmount(temp.toFixed(2));
+    const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    setSubAmount(subtotal);
   }, [cartItems]);
 
-  useEffect(() => {
-    cartItems.forEach((item) => {
-      if (item.quantity === 2 && item.name === "Smoke Sensor X-Sense") {
-        smokeQuantity = 4.98;
-        setQuantityDiscount(smokeQuantity);
-      }
-      if (item.quantity === 3 && item.name === "Motion Sensor Guardline") {
-        motionQuantity = 9.97;
-        setQuantityDiscount(motionQuantity);
-      } else {
-        setQuantityDiscount(motionQuantity + smokeQuantity);
-      }
-    });
-  }, [cartItems]);
+  const increaseQuantity = (product) => {
+    dispatch({ type: "INCREASE_QUANTITY", payload: product });
+  };
+
+  const decreaseQuantity = (product) => {
+    dispatch({ type: "DECREASE_QUANTITY", payload: product });
+  };
 
   useEffect(() => {
-    if (promoDiscount1) {
-      setTotalAmount(totalAmount - promoDiscount1);
-      setPromoDiscountTotal(promoDiscount1 + promoDiscount3);
-    }
-    if (promoDiscount3) {
-      setTotalAmount(totalAmount - promoDiscount3);
-      setPromoDiscountTotal(promoDiscount3 + promoDiscount1);
-    }
-    if (promoDiscount4) {
-      setTotalAmount(totalAmount - promoDiscount4);
-      setPromoDiscountTotal(promoDiscount4);
-    }
-    if (promoDiscount2) {
-      setTotalAmount(totalAmount - promoDiscount2);
-      setPromoDiscountTotal(promoDiscount2 + promoDiscount3);
-    }
-  }, [globalCounter]);
+    const tier = discountTiers.find((t) => subAmount >= t.min);
+    const discount = tier ? tier.off : 0;
 
-  useEffect(() => {
-    let temp = 0;
-    cartItems.forEach((item) => {
-      temp = temp + item.price * item.quantity;
-    });
-    setTotalAmount(temp - smokeQuantity - motionQuantity);
-  }, [cartItems]);
+    setDiscountAmount(discount);
+
+    const total = subAmount - discount;
+    setTotalAmount(total > 0 ? total : 0);
+  }, [subAmount]);
 
   const deleteFromCart = (product) => {
     dispatch({ type: "DELETE_FROM_CART", payload: product });
   };
 
   const placeOrder = async () => {
-    const UserInfo = {
-      email,
-      address,
-      card,
-    };
-
     const orderInfo = {
       cartItems,
-      UserInfo,
+      totalAmount: Number(totalAmount),
+      createdAt: serverTimestamp(),
     };
 
     try {
-      const result = await addDoc(collection(techDB, "orders"), orderInfo);
-      handleClose();
+      await addDoc(collection(techDB, "orders"), orderInfo);
+      dispatch({ type: "CLEAR_CART" });
+      setOrderSuccess(true);
     } catch (error) {
-      console.error(`order failed:${error}`);
+      console.error(`order failed: ${error}`);
     }
   };
-  const solvePromo = () => {
-    if (promoObj.first === promoText) {
-      if (!counter4 && !counter3 && !counter1) {
-        setCounter1(1);
-        setGlobalCounter(1);
-        setPromoDiscount1(totalAmount * 0.05).toFixed(2);
-      }
-      if (counter3 && !counter4 && !counter1 && !counter2) {
-        setCounter2(1);
-        setGlobalCounter(2);
-        setPromoDiscount2(totalAmount * 0.05).toFixed(2);
-      }
-    }
-    if (promoObj.second === promoText) {
-      if (!counter4 && !counter3) {
-        setCounter3(1);
-        setGlobalCounter(3);
-        setPromoDiscount3(20);
-      }
-    }
-    if (promoObj.third === promoText) {
-      if (!counter1 && !counter2 && !counter3 && !counter4) {
-        setCounter4(1);
-        setGlobalCounter(4);
-        setPromoDiscount4(totalAmount * 0.2).toFixed(2);
-      }
-    }
+
+  const getNextTier = () => {
+    const sorted = [...discountTiers].sort((a, b) => a.min - b.min);
+    return sorted.find((tier) => subAmount < tier.min);
   };
+
+  const nextTier = getNextTier();
 
   return (
     <Layout>
-      <div className=" block_container">
-        <div className="bloc1">
-          <table>
-            <thead>
-              <tr>
-                <th>Image</th>
-                <th>Name</th>
-                <th>Quantity</th>
-                <th>Price</th>
-                <th>Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {cartItems.map((item) => {
-                return (
+      {isCartEmpty ? (
+        <div className="empty-cart">
+          <h2>Cart is empty</h2>
+          <p>Add some products to your cart to see them here.</p>
+        </div>
+      ) : (
+        <>
+          <div className="block_container">
+            <div className="bloc1">
+              <table>
+                <thead>
                   <tr>
-                    <div className="imageCard">
-                      <td>
-                        <img
-                          src={item.imageURL}
-                          height="90"
-                          width="90"
-                          alt=""
-                        ></img>
-                      </td>
-                    </div>
-
-                    <td>{item.name}</td>
-                    <td>{item.quantity}</td>
-                    <td>{item.price}.</td>
-                    <td>{item.price * item.quantity}.</td>
-                    <td>
-                      <FaTrash size={22} onClick={() => deleteFromCart(item)} />
-                    </td>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                    <th></th>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-        <div className="bloc2">
-          <h2>CART TOTAL</h2>
+                </thead>
+                <tbody>
+                  {cartItems.map((item) => (
+                    <tr key={item.id}>
+                      <td>
+                        <div className="imageCard">
+                          <img src={item.imageURL} height="90" width="90" alt={item.name} />
+                        </div>
+                      </td>
+                      <td>{item.name}</td>
+                      <td>
+                        <div className="qty-controls">
+                          <button className="qty-btn" onClick={() => decreaseQuantity(item)}>
+                            -
+                          </button>
+                          <span className="qty-value">{item.quantity}</span>
+                          <button className="qty-btn" onClick={() => increaseQuantity(item)}>
+                            +
+                          </button>
+                        </div>
+                      </td>
+                      <td>{item.price}€</td>
+                      <td>{(item.price * item.quantity).toFixed(2)}€</td>
+                      <td>
+                        <FaTrash size={22} className="trash-icon" onClick={() => deleteFromCart(item)} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-          <div>
-            <b> Subtotal:&nbsp;</b>
-            {Number(subAmount).toFixed(2)}€
-          </div>
-          <div>
-            <b> Quantity Discount:&nbsp;</b>
-            {Number(quantityDiscount).toFixed(2)}€
-          </div>
-          <div>
-            <b> Promo Discount:&nbsp;</b>
-            {Number(promodiscountTotal).toFixed(2)}€
-          </div>
-          <div>
-            <b> Total:&nbsp;</b> {Number(totalAmount).toFixed(2)}€
-          </div>
-          <div className="promo">
-            <button
-              className="btnPromo"
-              onClick={() => {
-                solvePromo();
-              }}
-            >
-              PROMO
-            </button>
-            <input
-              type="text"
-              className="inputPromo"
-              value={promoText}
-              onChange={(e) => {
-                setPromo(e.target.value);
-              }}
-            ></input>
-          </div>
-          <div className="check">
-            <button onClick={handleShow}> CHECKOUT</button>
-          </div>
-        </div>
-      </div>
+            <div className="bloc2">
+              <h2>CART TOTAL</h2>
+              <div className="discount-info">
+                <div className="discount-list">
+                  <div>
+                    over €159 <span>€20 off</span>
+                  </div>
+                  <div>
+                    over €79 <span>€10 off</span>
+                  </div>
+                  <div>
+                    over €49 <span>€6 off</span>
+                  </div>
+                  <div>
+                    over €15 <span>€2 off</span>
+                  </div>
+                </div>
+                {nextTier ? (
+                  <div className="discount-next">
+                    Add {(nextTier.min - subAmount).toFixed(2)}€ more to unlock <span>{nextTier.off}€ off</span>
+                  </div>
+                ) : (
+                  <div className="discount-next"> Maximum discount applied</div>
+                )}
+              </div>
 
-      <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>ENTER YOUR DATA</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <input
-            type="text"
-            className="form-control"
-            placeholder="email"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-            }}
-          />
+              <div>
+                <b>Subtotal:&nbsp;</b>
+                {subAmount.toFixed(2)}€
+              </div>
 
-          <textarea
-            type="text"
-            className="form-control"
-            placeholder="adress"
-            value={address}
-            onChange={(e) => {
-              setAddress(e.target.value);
-            }}
-          />
+              <div>
+                <b>Discount:&nbsp;</b>
+                {discountAmount.toFixed(2)}€
+              </div>
 
-          <input
-            type="number"
-            className="form-control"
-            placeholder="card number"
-            value={card}
-            onChange={(e) => {
-              setCardNumber(e.target.value);
-            }}
-          />
-        </Modal.Body>
-        <Modal.Footer>
-          <button onClick={handleClose}>CLOSE</button>
-          <button onClick={placeOrder}>ORDER</button>
-        </Modal.Footer>
-      </Modal>
+              <div>
+                <b>Total:&nbsp;</b>
+                {totalAmount.toFixed(2)}€
+              </div>
+
+              <div className="check">
+                <button onClick={handleShow}>CHECKOUT</button>
+              </div>
+            </div>
+          </div>
+
+          <Modal show={show} onHide={handleClose}>
+            <Modal.Header closeButton>
+              <Modal.Title>ORDER SUMMARY</Modal.Title>
+            </Modal.Header>
+
+            <Modal.Body>
+              {!orderSuccess ? (
+                <>
+                  {cartItems.map((item) => (
+                    <div key={item.id} className="d-flex justify-content-between mb-2">
+                      <span>
+                        {item.name} x {item.quantity}
+                      </span>
+                      <span>{(item.price * item.quantity).toFixed(2)}€</span>
+                    </div>
+                  ))}
+
+                  <hr />
+
+                  <div className="d-flex justify-content-between">
+                    <b>Subtotal:</b>
+                    <b>{subAmount.toFixed(2)}€</b>
+                  </div>
+
+                  <div className="d-flex justify-content-between">
+                    <b>Discount:</b>
+                    <b style={{ color: "#d7263d" }}>-{discountAmount.toFixed(2)}€</b>
+                  </div>
+
+                  <div className="d-flex justify-content-between">
+                    <b>Total:</b>
+                    <b>{totalAmount.toFixed(2)}€</b>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center">
+                  <h3>Order placed successfully!</h3>
+                </div>
+              )}
+            </Modal.Body>
+
+            <Modal.Footer>
+              {!orderSuccess ? (
+                <>
+                  <button onClick={handleClose}>CANCEL</button>
+                  <button onClick={placeOrder}>CONFIRM ORDER</button>
+                </>
+              ) : (
+                <button
+                  onClick={() => {
+                    setOrderSuccess(false);
+                    handleClose();
+                  }}
+                >
+                  CLOSE
+                </button>
+              )}
+            </Modal.Footer>
+          </Modal>
+        </>
+      )}
     </Layout>
   );
 }
