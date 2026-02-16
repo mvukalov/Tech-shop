@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Modal } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
@@ -20,8 +21,13 @@ function CartPage() {
   const [show, setShow] = useState(false);
   const [subAmount, setSubAmount] = useState(0);
   const [orderSuccess, setOrderSuccess] = useState(false);
+  const [orderJustPlaced, setOrderJustPlaced] = useState(false);
 
   const isCartEmpty = cartItems.length === 0;
+
+  useEffect(() => {
+    if (cartItems.length > 0) setOrderJustPlaced(false);
+  }, [cartItems.length]);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -66,6 +72,7 @@ function CartPage() {
       await addDoc(collection(techDB, "orders"), orderInfo);
       dispatch({ type: "CLEAR_CART" });
       setOrderSuccess(true);
+      setOrderJustPlaced(true);
     } catch (error) {
       console.error(`order failed: ${error}`);
     }
@@ -82,8 +89,25 @@ function CartPage() {
     <Layout>
       {isCartEmpty ? (
         <div className="empty-cart">
-          <h2>Cart is empty</h2>
-          <p>Add some products to your cart to see them here.</p>
+          {orderJustPlaced ? (
+            <>
+              <h2 style={{ color: "#22c55e", marginBottom: "12px" }}>Order placed successfully!</h2>
+              <p>Thank you for your purchase. You can view your orders or continue shopping.</p>
+              <div style={{ marginTop: "20px", display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
+                <Link to="/orders" style={{ textDecoration: "none" }}>
+                  <button>VIEW ORDERS</button>
+                </Link>
+                <Link to="/" style={{ textDecoration: "none" }}>
+                  <button>CONTINUE SHOPPING</button>
+                </Link>
+              </div>
+            </>
+          ) : (
+            <>
+              <h2>Cart is empty</h2>
+              <p>Add some products to your cart to see them here.</p>
+            </>
+          )}
         </div>
       ) : (
         <>

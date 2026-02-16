@@ -262,11 +262,57 @@
     flex: none;
     max-width: 100%;
     width: 100%;
+    display: flex;
   }
 
   .product {
-    margin: 0 auto !important;
+    margin: 0 !important;
     margin-bottom: 16px !important;
+    height: 100% !important;
+    min-height: 220px;
+    padding: 8px;
+    box-sizing: border-box;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .product-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .product-content .text-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .product-title {
+    flex-shrink: 0;
+    min-height: 2.8rem;
+  }
+
+  .product-title p {
+    font-size: 16px;
+    margin: 0 0 6px;
+  }
+
+  .product-img {
+    height: 8rem !important;
+    max-height: 110px;
+    min-height: 80px;
+    object-fit: contain;
+    flex: 1;
+  }
+
+  .product-actions {
+    opacity: 0;
+  }
+
+  .product-actions h2 {
+    font-size: 18px;
   }
 
   .bloc1,
@@ -286,5 +332,27 @@
 
   .discount-next {
     white-space: normal;
+  }
+}
+
+/* Extra mali ekrani – dva stupca, kompaktnije kartice */
+@media (max-width: 480px) {
+  .product {
+    min-height: 200px;
+  }
+
+  .product-title {
+    min-height: 2.5rem;
+    font-size: 14px;
+  }
+
+  .product-title p {
+    font-size: 14px;
+  }
+
+  .product-img {
+    height: 6.5rem !important;
+    max-height: 85px;
+    min-height: 60px;
   }
 }
