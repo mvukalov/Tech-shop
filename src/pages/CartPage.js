@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
@@ -21,7 +21,7 @@ function CartPage() {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
-  const discountTiers = [
+  const DISCOUNT_TIERS = [
     { min: 159, off: 20 },
     { min: 79, off: 10 },
     { min: 49, off: 6 },
@@ -46,7 +46,7 @@ function CartPage() {
   };
 
   useEffect(() => {
-    const tier = discountTiers.find((t) => subAmount >= t.min);
+    const tier = DISCOUNT_TIERS.find((t) => subAmount >= t.min);
     const discount = tier ? tier.off : 0;
 
     setDiscountAmount(discount);
@@ -76,7 +76,7 @@ function CartPage() {
   };
 
   const getNextTier = () => {
-    const sorted = [...discountTiers].sort((a, b) => a.min - b.min);
+    const sorted = [...DISCOUNT_TIERS].sort((a, b) => a.min - b.min);
     return sorted.find((tier) => subAmount < tier.min);
   };
 
