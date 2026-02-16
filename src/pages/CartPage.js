@@ -3,9 +3,15 @@ import { Modal } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import Layout from "../components/Layout";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import techDB from "../fireConfig";
-import { serverTimestamp } from "firebase/firestore";
+
+const DISCOUNT_TIERS = [
+  { min: 159, off: 20 },
+  { min: 79, off: 10 },
+  { min: 49, off: 6 },
+  { min: 15, off: 2 },
+];
 
 function CartPage() {
   const { cartItems } = useSelector((state) => state.cartReducer);
@@ -13,20 +19,12 @@ function CartPage() {
 
   const [show, setShow] = useState(false);
   const [subAmount, setSubAmount] = useState(0);
-  const [discountAmount, setDiscountAmount] = useState(0);
-  const [totalAmount, setTotalAmount] = useState(0);
   const [orderSuccess, setOrderSuccess] = useState(false);
+
   const isCartEmpty = cartItems.length === 0;
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-
-  const DISCOUNT_TIERS = [
-    { min: 159, off: 20 },
-    { min: 79, off: 10 },
-    { min: 49, off: 6 },
-    { min: 15, off: 2 },
-  ];
 
   useEffect(() => {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
@@ -45,19 +43,17 @@ function CartPage() {
     dispatch({ type: "DECREASE_QUANTITY", payload: product });
   };
 
-  useEffect(() => {
-    const tier = DISCOUNT_TIERS.find((t) => subAmount >= t.min);
-    const discount = tier ? tier.off : 0;
-
-    setDiscountAmount(discount);
-
-    const total = subAmount - discount;
-    setTotalAmount(total > 0 ? total : 0);
-  }, [subAmount]);
-
   const deleteFromCart = (product) => {
     dispatch({ type: "DELETE_FROM_CART", payload: product });
   };
+
+  // ✅ Derived values (no useEffect needed)
+  const discountAmount = (() => {
+    const tier = DISCOUNT_TIERS.find((t) => subAmount >= t.min);
+    return tier ? tier.off : 0;
+  })();
+
+  const totalAmount = Math.max(0, subAmount - discountAmount);
 
   const placeOrder = async () => {
     const orderInfo = {
@@ -152,12 +148,13 @@ function CartPage() {
                     over €15 <span>€2 off</span>
                   </div>
                 </div>
+
                 {nextTier ? (
                   <div className="discount-next">
                     Add {(nextTier.min - subAmount).toFixed(2)}€ more to unlock&nbsp;<span>{nextTier.off}€ off</span>
                   </div>
                 ) : (
-                  <div className="discount-next"> Maximum discount applied</div>
+                  <div className="discount-next">Maximum discount applied</div>
                 )}
               </div>
 
