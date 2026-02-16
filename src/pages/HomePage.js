@@ -1,16 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout";
-import { collection, addDoc, getDocs, doc } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import techDB from "../fireConfig";
-import { techProducts } from "../techshop-products";
-import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 function HomePage() {
   const [products, setProducts] = useState([]);
   const { cartItems } = useSelector((state) => state.cartReducer);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   useEffect(() => {
     getData();
